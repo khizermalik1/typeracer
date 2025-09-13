@@ -30,7 +30,11 @@
     <!-- Header / Navbar -->
     <header class="bg-orange text-white text-center py-3">
       <h1 class="mb-0" style="font-family: 'Alegreya', serif">TypeRacer</h1>
-      <button class="btn btn-light btn-outline-orange mt-2">
+      <button
+        class="btn btn-light btn-outline-orange mt-2"
+        data-bs-toggle="modal"
+        data-bs-target="#instructionsModal"
+      >
         Instructions
       </button>
     </header>
@@ -75,9 +79,9 @@
 
           <!-- Buttons -->
           <div class="d-flex gap-2">
-            <button class="btn btn-white btn-outline-orange">Start</button>
-            <button class="btn btn-white btn-outline-orange">Stop</button>
-            <button class="btn btn-white btn-outline-orange">Retry</button>
+            <button id="retry-btn" class="btn btn-white btn-outline-orange">
+              Retry
+            </button>
           </div>
         </div>
 
@@ -95,5 +99,62 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
     <!-- Custom JS -->
     <script src="assets/js/script.js"></script>
+    <!-- Instructions Modal -->
+    <div
+      class="modal fade"
+      id="instructionsModal"
+      tabindex="-1"
+      aria-labelledby="instructionsModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="instructionsModalLabel">
+              How to Use TypeRacer
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <ol>
+              <li>Select your desired difficulty level from the dropdown.</li>
+              <li>
+                A sample text will appear. You can refresh it for a new one of
+                the same difficulty.
+              </li>
+              <li>
+                Click in the typing area and begin typing. The timer will start
+                automatically.
+              </li>
+              <li>
+                As you type, correct words will be highlighted in blue,
+                incorrect in red.
+              </li>
+              <li>
+                Press <b>Enter</b> to finish the test. The typing area will be
+                disabled and your results will be shown.
+              </li>
+              <li>
+                Click <b>Retry</b> to try a new sample of the same difficulty.
+                The typing area will be cleared and re-enabled.
+              </li>
+              <li>
+                WPM is calculated based on the number of correct words and the
+                time taken.
+              </li>
+            </ol>
+            <p class="mb-0">
+              <b>Tip:</b> You can change the difficulty or refresh the sample at
+              any time before starting a new test.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

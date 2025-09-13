@@ -18,26 +18,71 @@ function updateSampleTextHighlight() {
 
 	sampleTextElem.innerHTML = highlighted.join(' ');
 }
-function clearTypingArea() {
-	const textarea = document.querySelector('textarea.form-control');
-	if (textarea) {
-		textarea.value = '';
-	}
-}
-	const retryBtn = document.querySelector('button.btn.btn-white.btn-outline-orange:nth-child(3)');
+// --- Removed old retry button code ---
 
-	if (retryBtn) {
-		retryBtn.addEventListener('click', clearTypingArea);
-	}
 // Typing Test Timer Logic
 let testStartTime = null;
 let testEndTime = null;
+let testStarted = false;
+let testEnded = false;
 
-function startTypingTest() {
-	testStartTime = Date.now();
-	testEndTime = null;
-	setButtonStates(true, false);
+function startTypingTestAuto() {
+	if (!testStarted) {
+		testStartTime = Date.now();
+		testEndTime = null;
+		testStarted = true;
+		testEnded = false;
+		clearTestTimeDisplay();
+		setRetryButtonState(true);
+	}
+}
+
+function stopTypingTestAuto() {
+	if (testStarted && !testEnded) {
+		testEndTime = Date.now();
+		const elapsedSeconds = (testEndTime - testStartTime) / 1000;
+		displayTestTime(elapsedSeconds);
+
+		// Calculate WPM and display
+		const sampleTextElem = document.getElementById('sample-text');
+		const textarea = document.querySelector('textarea.form-control');
+		const difficultySelect = document.getElementById('difficulty');
+		const sampleText = sampleTextElem ? sampleTextElem.textContent : '';
+		const typedText = textarea ? textarea.value : '';
+		const difficulty = difficultySelect ? difficultySelect.value : '-';
+
+		const correctWords = calculateCorrectWords(sampleText, typedText);
+		const wpm = elapsedSeconds > 0 ? Math.round((correctWords / elapsedSeconds) * 60) : 0;
+		displayWPM(wpm);
+		displayDifficulty(difficulty);
+
+		if (textarea) textarea.disabled = true;
+		setRetryButtonState(false);
+		testEnded = true;
+	}
+}
+
+function setRetryButtonState(isDisabled) {
+	const retryBtn = document.getElementById('retry-btn');
+	if (retryBtn) retryBtn.disabled = isDisabled;
+}
+
+function clearTypingAreaAndReset() {
+	const textarea = document.querySelector('textarea.form-control');
+	if (textarea) {
+		textarea.value = '';
+		textarea.disabled = false;
+		textarea.focus();
+	}
 	clearTestTimeDisplay();
+	displayWPM('-');
+	displayDifficulty('-');
+	testStarted = false;
+	testEnded = false;
+	// Load new sample text of same difficulty
+	updateSampleText();
+	setTimeout(updateSampleTextHighlight, 0);
+	setRetryButtonState(true);
 }
 
 
@@ -141,21 +186,17 @@ function updateSampleText() {
 	}
 }
 
-// Event listener for difficulty change
+// Event listener for difficulty change and auto test logic
 document.addEventListener('DOMContentLoaded', function() {
 	const difficultySelect = document.getElementById('difficulty');
 	const refreshBtn = document.getElementById('refresh-sample');
-	const startBtn = document.querySelector('button.btn.btn-white.btn-outline-orange:nth-child(1)');
-	const stopBtn = document.querySelector('button.btn.btn-white.btn-outline-orange:nth-child(2)');
-
-	// Assign IDs to Start and Stop buttons for easier reference
-	if (startBtn) startBtn.id = 'start-btn';
-	if (stopBtn) stopBtn.id = 'stop-btn';
+	const retryBtn = document.getElementById('retry-btn');
 
 	if (difficultySelect) {
 		difficultySelect.addEventListener('change', function() {
 			updateSampleText();
 			setTimeout(updateSampleTextHighlight, 0);
+			clearTypingAreaAndReset();
 		});
 		// Set initial sample text
 		updateSampleText();
@@ -166,20 +207,28 @@ document.addEventListener('DOMContentLoaded', function() {
 			e.preventDefault();
 			updateSampleText();
 			setTimeout(updateSampleTextHighlight, 0);
+			clearTypingAreaAndReset();
 		});
 	}
-	if (startBtn) {
-		startBtn.addEventListener('click', startTypingTest);
-		startBtn.disabled = false;
-	}
-	if (stopBtn) {
-		stopBtn.addEventListener('click', stopTypingTest);
-		stopBtn.disabled = true;
+	if (retryBtn) {
+		retryBtn.addEventListener('click', clearTypingAreaAndReset);
+		setRetryButtonState(true);
 	}
 
-	// Real-time feedback: highlight as user types
+	// Real-time feedback: highlight as user types, and auto start/stop
 	const textarea = document.querySelector('textarea.form-control');
 	if (textarea) {
-		textarea.addEventListener('input', updateSampleTextHighlight);
+		textarea.addEventListener('input', function(e) {
+			updateSampleTextHighlight();
+			if (!testStarted && textarea.value.trim().length > 0) {
+				startTypingTestAuto();
+			}
+		});
+		textarea.addEventListener('keydown', function(e) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				stopTypingTestAuto();
+			}
+		});
 	}
 });
