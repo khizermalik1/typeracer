@@ -1,0 +1,39 @@
+body {
+  background-color: #f8f9fa;
+}
+
+header {
+  border-bottom: 2px solid #ff8400;
+}
+
+h1 {
+  color: #ff8400;
+}
+
+button.btn-warning {
+  color: #fff;
+  background-color: #ff8400;
+  border-color: #ff8400;
+}
+/* Custom orange shade */
+.bg-orange {
+  background-color: #ff8400;
+}
+
+.btn-outline-orange {
+  border: 2px solid #ff8400;
+  color: #ff8400;
+}
+
+.btn-white {
+  background-color: #fff;
+}
+
+.btn-outline-orange:hover {
+  background-color: #ff8400;
+  color: #fff;
+}
+
+header h1 {
+  color: #fff;
+}
